@@ -1,3 +1,7 @@
+This is a fork of Davide Cesari's FortranGIS. If I have time I hope to add some additional functions from gdal_utils and gdal_alg APIs.
+
+------------------------------------------------------------
+
 ## [FortranGIS project](http://fortrangis.sourceforge.net/index.php)
 
 FortranGIS project includes a collection of Fortran interfaces to some
