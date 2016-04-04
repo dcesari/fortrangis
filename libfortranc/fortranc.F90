@@ -15,7 +15,7 @@
 !    You should have received a copy of the GNU Lesser General Public
 !    License along with FortranGIS.  If not, see
 !    <http://www.gnu.org/licenses/>.
-#include "config.h"
+!#include "config.h"
 
 !> Utility module for supporting Fortran 2003 C language interface module.
 !! This module contains various utilties for simplifying the exchange
