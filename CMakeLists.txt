@@ -20,6 +20,8 @@
 
 message("Processing top-level CMakelists.txt for project fortrangis")
 
+include( CMakeForceCompiler )
+
 #------------------------------------------------------------------------------------#
 #                           Build directory check                                    #
 #------------------------------------------------------------------------------------#
@@ -44,5 +46,11 @@ set(PACKAGE_NAME "fortrangis")
 cmake_minimum_required(VERSION 2.8)
 
 include_directories( ${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/libfortranc )
+include( cmake/version_control.cmake )
+
+
+set( EXTERNAL_LIBS ${FORTRANGIS_EXTERNAL_LIBS})
 
 add_subdirectory(libfortrangis)
+
+include( cmake/print_summary.cmake )
