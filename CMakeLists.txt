@@ -1,56 +1,102 @@
-# CMake project for fortrangis
-
-# This script expects that the following configuration variables are
-# set and passed during CMake invocation:
-
-# CMAKE_BINARY_DIR
-# DESIRED_BUILD_TYPE     | possible values: "debug", "release", "profile"
-# CMAKE_INSTALL_PREFIX   | ex: "D:/DOS"
-# Fortran_FLAGS_DEBUG
-# Fortran_FLAGS_RELEASE
-# Fortran_FLAGS_PROFILE
-# PATH_TO_R
-# OS                     | possible values: "win_x86", "win_x64", "max_osx", "linux_x64"
-# Fortran_COMPILER_NAME  | ex: "gfortran", "ifort"
-# COMPILER_VERSION       | ex: "4.8.2"
-# LIB_PATH1
-# LIB_PATH2
-# LIB_PATH3
-# LIB_PATH4
-
-message("Processing top-level CMakelists.txt for project fortrangis")
-
-include( CMakeForceCompiler )
-
-#------------------------------------------------------------------------------------#
-#                           Build directory check                                    #
-#------------------------------------------------------------------------------------#
-if(${CMAKE_SOURCE_DIR}/src STREQUAL ${CMAKE_BINARY_DIR})
-  message(FATAL_ERROR "Cannot be built in the source directory. Use
-  out-of-source build instead.")
-  message(FATAL_ERROR "  cd /some/work/dir/build")
-  message(FATAL_ERROR "  cmake -i /path/to/source")
-endif()
-
-#------------------------------------------------------------------------
-# Set basic project settings
-#------------------------------------------------------------------------
+# CMake file for the FortranGIS project
 #
-project (fortrangis Fortran C)
-enable_language (Fortran C)
 
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
+#
+# Require the minimum version for CMake - as suggested by CMake itself
+#
+cmake_minimum_required(VERSION 3.6)
 
-set(PACKAGE_NAME "fortrangis")
+#
+# We need at least Fortran and C is required by CMake
+#
+enable_language(C)
+enable_language(Fortran)
 
-cmake_minimum_required(VERSION 2.8)
+#
+# TODO: check ISO_C_BINDING
+#
 
-include_directories( ${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/libfortranc )
-include( cmake/version_control.cmake )
+#
+# Find the optional components - at least one must be present
+#
+set(GOBUILD 0)
 
+option(BUILD_SHAPELIB "Build Shapelib library" ON)
+option(BUILD_PROJ "Build Proj library" ON)
+option(BUILD_GDAL "Build Gdal library" ON)
+option(BUILD_READOSM "Build ReadOSM library" OFF)
 
-set( EXTERNAL_LIBS ${FORTRANGIS_EXTERNAL_LIBS})
+if(BUILD_SHAPELIB)
+  find_library(SHAPELIB_LIBRARY
+    NAMES shp shapelib
+    )
+  if(SHAPELIB_LIBRARY)
+    set(GOBUILD 1)
+#    set(HAVE_SHAPELIB ON CACHE BOOL "No Shape library" FORCE)
+    message(STATUS "Shapelib: found")
+  else(SHAPELIB_LIBRARY)
+    message(STATUS "Shapelib: not found")
+  endif(SHAPELIB_LIBRARY)
+endif(BUILD_SHAPELIB)
 
+if(BUILD_GDAL)
+  find_library(GDAL_LIBRARY
+    NAMES gdal gdal19 gdallib
+    )
+  if(GDAL_LIBRARY)
+    set(GOBUILD 1)
+    message(STATUS "GDAL library: found")
+  else(GDAL_LIBRARY)
+    message(STATUS "GDAL library: not found")
+  endif(GDAL_LIBRARY)
+endif(BUILD_GDAL)
+
+if(BUILD_PROJ)
+  find_library(PROJ_LIBRARY
+    NAMES proj projlib
+    )
+  if(PROJ_LIBRARY)
+    set(GOBUILD 1)
+    message(STATUS "Proj library: found")
+  else(PROJ_LIBRARY)
+    message(STATUS "Proj library: not found")
+  endif(PROJ_LIBRARY)
+endif(BUILD_PROJ)
+
+if(BUILD_READOSM)
+  find_library(READOSM_LIBRARY
+    NAMES readosm readosmlib
+    )
+  if(READOSM_LIBRARY)
+    set(GOBUILD 1)
+    message(STATUS "ReadOSM library: found")
+  else(READOSM_LIBRARY)
+    message(STATUS "ReadOSM library: not found")
+  endif(READOSM_LIBRARY)
+endif(BUILD_READOSM)
+
+#
+# Do we have a reason to build the libraries?
+#
+if(NOT GOBUILD)
+    message(FATAL_ERROR "At least one component of Shapelib, GDAL, Proj or ReadOSM must be present - none were found")
+endif(NOT GOBUILD)
+
+#
+# Run over the subdirectories ...
+#
+enable_testing()
+add_subdirectory(libfortranc)
 add_subdirectory(libfortrangis)
 
-include( cmake/print_summary.cmake )
+#
+# Configure the config.h file
+# renamed to cmake_config.h.in to avoid conflict with automake since
+# this one needs to be under version control
+#
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/cmake_config.h.in
+    ${CMAKE_CURRENT_BINARY_DIR}/config.h
+    )
+
+#summary()
