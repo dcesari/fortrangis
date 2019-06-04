@@ -12,7 +12,7 @@ if(SHAPELIB_LIBRARY)
     set(fortrangisc_LIB_SRCS
         shapelibint.c
         )
-    list(APPEND fortrangis_LIBS ${SHAPELIB_LIBRARY})
+    set( fortrangis_LIBS ${fortrangis_LIBS} ${SHAPELIB_LIBRARY})
 
 endif(SHAPELIB_LIBRARY)
 
@@ -20,22 +20,25 @@ if(PROJ_LIBRARY)
     list(APPEND fortrangis_LIB_SRCS
         proj.F90
         )
-    list(APPEND fortrangis_LIBS ${PROJ_LIBRARY})
+    set( fortrangis_LIBS ${fortrangis_LIBS} ${PROJ_LIBRARY})
 endif(PROJ_LIBRARY)
 
 if(GDAL_LIBRARY)
     list(APPEND fortrangis_LIB_SRCS
         gdal.F90
         )
-    list(APPEND fortrangis_LIBS ${GDAL_LIBRARY})
+    set( fortrangis_LIBS ${fortrangis_LIBS} ${GDAL_LIBRARY})
 endif(GDAL_LIBRARY)
 
 if(READOSM_LIBRARY)
     list(APPEND fortrangis_LIB_SRCS
         readosm.F90
         )
-    list(APPEND fortrangis_LIBS ${READOSM_LIBRARY})
+    set( fortrangis_LIBS ${fortrangis_LIBS} ${READOSM_LIBRARY})
 endif(READOSM_LIBRARY)
+
+set( fortrangis_LIBS ${fortrangis_LIBS} ${EXTERNAL_LIBS})
+set( fortrangis_LIBS ${fortrangis_LIBS} PARENT_SCOPE)
 
 message(STATUS "${fortrangis_LIB_SRCS}")
 
